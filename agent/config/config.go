@@ -671,6 +671,7 @@ type Telemetry struct {
 	DogstatsdAddr                      *string  `mapstructure:"dogstatsd_addr"`
 	DogstatsdTags                      []string `mapstructure:"dogstatsd_tags"`
 	FilterDefault                      *bool    `mapstructure:"filter_default"`
+	LabelFilter                        []string `mapstructure:"label_filter"`
 	PrefixFilter                       []string `mapstructure:"prefix_filter"`
 	MetricsPrefix                      *string  `mapstructure:"metrics_prefix"`
 	PrometheusRetentionTime            *string  `mapstructure:"prometheus_retention_time"`

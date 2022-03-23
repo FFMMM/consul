@@ -640,6 +640,7 @@ func (b *builder) build() (rt RuntimeConfig, err error) {
 	}
 
 	// Parse the metric filters
+	// todo -- annotate/ parse
 	var telemetryAllowedPrefixes, telemetryBlockedPrefixes []string
 	for _, rule := range c.Telemetry.PrefixFilter {
 		if rule == "" {
@@ -651,6 +652,24 @@ func (b *builder) build() (rt RuntimeConfig, err error) {
 			telemetryAllowedPrefixes = append(telemetryAllowedPrefixes, rule[1:])
 		case '-':
 			telemetryBlockedPrefixes = append(telemetryBlockedPrefixes, rule[1:])
+		default:
+			b.warn("Filter rule must begin with either '+' or '-': %q", rule)
+		}
+	}
+
+	// todo -- make the func
+	var telemetryAllowedLabels, telemetryBlockedLabels []string
+	for _, rule := range c.Telemetry.LabelFilter {
+		if rule == "" {
+			b.warn("cannot have empty filter rule in label_filter; ignoring rule.")
+			continue
+		}
+
+		switch rule[0] {
+		case '+':
+			telemetryAllowedLabels = append(telemetryAllowedPrefixes, rule[1:])
+		case '-':
+			telemetryBlockedLabels = append(telemetryBlockedPrefixes, rule[1:])
 		default:
 			b.warn("Filter rule must begin with either '+' or '-': %q", rule)
 		}
@@ -927,6 +946,8 @@ func (b *builder) build() (rt RuntimeConfig, err error) {
 			FilterDefault:                      boolVal(c.Telemetry.FilterDefault),
 			AllowedPrefixes:                    telemetryAllowedPrefixes,
 			BlockedPrefixes:                    telemetryBlockedPrefixes,
+			AllowedLabels:                      telemetryAllowedLabels,
+			BlockedLabels:                      telemetryBlockedLabels,
 			MetricsPrefix:                      stringVal(c.Telemetry.MetricsPrefix),
 			StatsdAddr:                         stringVal(c.Telemetry.StatsdAddr),
 			StatsiteAddr:                       stringVal(c.Telemetry.StatsiteAddr),

@@ -173,6 +173,21 @@ type TelemetryConfig struct {
 	//
 	// hcl: telemetry { prefix_filter = []string{"-<expr>", "-<expr>", ...} }
 	BlockedPrefixes []string `json:"blocked_prefixes,omitempty" mapstructure:"blocked_prefixes"`
+	// telemetry { prefix_filter = []string{"-<rpc>", "-<server>", "-<call>"...} }
+
+	// AllowedPrefixes is a list of filter rules to apply for allowing labels.
+	// Use the 'label_filter' option and prefix rules with '+' to be
+	// included.
+	//
+	// hcl: telemetry { label_filter = []string{"+<expr>", "+<expr>", ...} }
+	AllowedLabels []string `json:"allowed_labels,omitempty" mapstructure:"allowed_labels"`
+
+	// BlockedPrefixes is a list of filter rules to apply for blocking labels.
+	// Use the 'label_filter' option and prefix rules with '-' to be
+	// excluded.
+	//
+	// hcl: telemetry { prefix_filter = []string{"-<expr>", "-<expr>", ...} }
+	BlockedLabels []string `json:"blocked_labels,omitempty" mapstructure:"blocked_labels"`
 
 	// MetricsPrefix is the prefix used to write stats values to.
 	// Default: "consul."
@@ -351,6 +366,11 @@ func InitTelemetry(cfg TelemetryConfig) (*metrics.InmemSink, error) {
 	metricsConf.FilterDefault = cfg.FilterDefault
 	metricsConf.AllowedPrefixes = cfg.AllowedPrefixes
 	metricsConf.BlockedPrefixes = cfg.BlockedPrefixes
+
+	// todo actually pass in the cfg.AllowedLabels or cfg.BlockedPrefixes
+	metricsConf.AllowedLabels = nil
+	metricsConf.BlockedLabels = []string{"Coordinate.Update", "Status.RaftStats"}
+
 
 	var sinks metrics.FanoutSink
 	addSink := func(fn func(TelemetryConfig, string) (metrics.MetricSink, error)) error {
